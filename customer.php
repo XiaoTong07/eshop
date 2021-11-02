@@ -8,6 +8,9 @@
 </head>
 
 <body>
+    <div class="menu">
+        <?php include 'navigationbar.php'; ?>
+    </div>
     <!-- container -->
     <div class="container">
         <div class="page-header">
@@ -20,18 +23,37 @@
             include 'config/database.php';
             try {
                 // insert query
-                $query = "INSERT INTO customers SET id=:id, name=:name, dateofbirth=:dateofbirth";
+                $query = "INSERT INTO customers SET username=:username, password=:password, confirmpassword=:confirmpassword,firstname=:firstname,lastname=:lastname,gender=:gender,dateofbirth=:dateofbirth,registrationdateandtime=:registrationdateandtime";
                 // prepare query for execution
                 $stmt = $con->prepare($query);
                 // posted values
-                $id = htmlspecialchars(strip_tags($_POST['id']));
-                $name = htmlspecialchars(strip_tags($_POST['name']));
-                $dateofbirth = htmlspecialchars(strip_tags($_POST['dateofbirth']));
+                $username = htmlspecialchars(strip_tags($_POST['username']));
+                $firstname = htmlspecialchars(strip_tags($_POST['firstname']));
+                $lastname = htmlspecialchars(strip_tags($_POST['lastname']));
+                $password = md5($_POST['password']);
+                $confirmpassword = md5($_POST['confirmpassword']);
+                $gender = htmlspecialchars(strip_tags($_POST['gender']));
+                $dateofbirth = date('Y-m-d', strtotime($_POST['dateofbirth']));
+
+                if (empty($password || $confirmpassword)) {
+                    echo "Please enter password.";
+                } elseif ($password != $confirmpassword) {
+                    echo "Password does not match.";
+                } elseif (strlen($password) < 6) {
+                    echo "Password should be at least 6 characters in length";
+                } else {
+
                 // bind the parameters
-                $stmt->bindParam(':id', $id);
-                $stmt->bindParam(':name', $name);
+                $stmt->bindParam(':username', $username);
+                $stmt->bindParam(':firstname', $firstname);
+                $stmt->bindParam(':lastname', $lastname);
+                $stmt->bindParam(':password', $password);
+                $stmt->bindParam(':confirmpassword', $confirmpassword);
+                $stmt->bindParam(':gender', $gender);
                 $stmt->bindParam(':dateofbirth', $dateofbirth);
                 // specify when this record was inserted to the database
+                $registrationdateandtime = date('Y-m-d H:i:s');
+                $stmt->bindParam(':registrationdateandtime', $registrationdateandtime);
                 // Execute the query
                 if ($stmt->execute()) {
                     echo "<div class='alert alert-success'>Record was saved.</div>";
@@ -39,6 +61,7 @@
                     echo "<div class='alert alert-danger'>Unable to save record.</div>";
                 }
             }
+        }
             // show error
             catch (PDOException $exception) {
                 die('ERROR: ' . $exception->getMessage());
@@ -49,12 +72,34 @@
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
             <table class='table table-hover table-responsive table-bordered'>
                 <tr>
-                    <td>id</td>
-                    <td><input type='text' name='id' class='form-control' ></td>
+                    <td>Username</td>
+                    <td><input type='text' name='username' class='form-control'></td>
                 </tr>
                 <tr>
-                    <td>name</td>
-                    <td><input type='text' name='name' class='form-control' /></td>
+                    <td>First Name</td>
+                    <td><input type='text' name='firstname' class='form-control' /></td>
+                </tr>
+                <tr>
+                    <td>Last Name</td>
+                    <td><input type='text' name='lastname' class='form-control' /></td>
+                </tr>
+                <tr>
+                    <td>Password</td>
+                    <td><input type='password' name='password' class='form-control' minlength="6"required /></td>
+                </tr>
+                <tr>
+                    <td>Confirm Password</td>
+                    <td><input type='password' name='confirmpassword' class='form-control' minlength="6"required /></td>
+                </tr>
+                <tr>
+                    <td>Gender</td>
+                    <td>
+                        <select class="form-select form-select-sm" name='gender' aria-label="Gender">
+                            <option selected>Choose Your Gender</option>
+                            <option value="0">Male</option>
+                            <option value="1">Female</option>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td>date of birth</td>
@@ -64,7 +109,7 @@
                     <td></td>
                     <td>
                         <input type='submit' value='Save' class='btn btn-primary' />
-                        <a href='index.php' class='btn btn-danger'>Back to read products</a>
+                        <a href='customerlist.php' class='btn btn-danger'>Back to read customer</a>
                     </td>
                 </tr>
             </table>

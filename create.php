@@ -8,6 +8,9 @@
 </head>
 
 <body>
+    <div class="menu">
+        <?php include 'navigationbar.php'; ?>
+    </div>
     <!-- container -->
     <div class="container">
         <div class="page-header">
@@ -20,26 +23,40 @@
             include 'config/database.php';
             try {
                 // insert query
-                $query = "INSERT INTO products SET name=:name, description=:description, price=:price, created=:created";
+                $query = "INSERT INTO products SET name=:name, description=:description, price=:price, promotionprice=:promotionprice, manufacturedate=:manufacturedate, expireddate=:expireddate, created=:created";
                 // prepare query for execution
                 $stmt = $con->prepare($query);
                 // posted values
                 $name = htmlspecialchars(strip_tags($_POST['name']));
                 $description = htmlspecialchars(strip_tags($_POST['description']));
                 $price = htmlspecialchars(strip_tags($_POST['price']));
-                // bind the parameters
-                $stmt->bindParam(':name', $name);
-                $stmt->bindParam(':description', $description);
-                $stmt->bindParam(':price', $price);
-                // specify when this record was inserted to the database
-                $created = date('Y-m-d H:i:s');
-                $stmt->bindParam(':created', $created);
-                // Execute the query
-                if ($stmt->execute()) {
-                    echo "<div class='alert alert-success'>Record was saved.</div>";
+                $promotionprice = htmlspecialchars(strip_tags($_POST['promotionprice']));
+                $manufacturedate = date(strip_tags($_POST['manufacturedate']));
+                $expireddate = date(strip_tags($_POST['expireddate']));
+
+                    // bind the parameters
+                    $stmt->bindParam(':name', $name);
+                    $stmt->bindParam(':description', $description);
+                    $stmt->bindParam(':price', $price);
+                    $stmt->bindParam(':promotionprice', $promotionprice);
+                    $stmt->bindParam(':manufacturedate', $manufacturedate);
+                    $stmt->bindParam(':expireddate', $expireddate);
+                    // specify when this record was inserted to the database
+                    $created = date('Y-m-d H:i:s');
+                    $stmt->bindParam(':created', $created);
+                    // Execute the query
+                    if ($stmt->execute()) {
+                        echo "<div class='alert alert-success'>Record was saved.</div>";
+                    } else {
+                        echo "<div class='alert alert-danger'>Unable to save record.</div>";
+                    }
+                
+
+                if (is_numeric($price)) {
+                    echo var_export($price, true) . " is numeric", PHP_EOL;
                 } else {
-                    echo "<div class='alert alert-danger'>Unable to save record.</div>";
-                }
+                    echo var_export($price, true) . " is NOT numeric", PHP_EOL;
+                }    
             }
             // show error
             catch (PDOException $exception) {
@@ -60,13 +77,25 @@
                 </tr>
                 <tr>
                     <td>Price</td>
-                    <td><input type='text' name='price' class='form-control' /></td>
+                    <td><input type='number' name='price' class='form-control' /></td>
+                </tr>
+                <tr>
+                    <td>Promotion Price</td>
+                    <td><input type='number' name='promotionprice' class='form-control' /></td>
+                </tr>
+                <tr>
+                    <td>Manufacture Date</td>
+                    <td><input type='date' name='manufacturedate' class='form-control' /></td>
+                </tr>
+                <tr>
+                    <td>Expired Date</td>
+                    <td><input type='date' name='expireddate' class='form-control' /></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td>
                         <input type='submit' value='Save' class='btn btn-primary' />
-                        <a href='index.php' class='btn btn-danger'>Back to read products</a>
+                        <a href='productlist.php' class='btn btn-danger'>Back to read products</a>
                     </td>
                 </tr>
             </table>
