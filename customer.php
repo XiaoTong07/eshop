@@ -22,46 +22,65 @@
             // include database connection
             include 'config/database.php';
             try {
-                // insert query
-                $query = "INSERT INTO customers SET username=:username, password=:password, confirmpassword=:confirmpassword,firstname=:firstname,lastname=:lastname,gender=:gender,dateofbirth=:dateofbirth,registrationdateandtime=:registrationdateandtime";
-                // prepare query for execution
-                $stmt = $con->prepare($query);
                 // posted values
-                $username = htmlspecialchars(strip_tags($_POST['username']));
-                $firstname = htmlspecialchars(strip_tags($_POST['firstname']));
-                $lastname = htmlspecialchars(strip_tags($_POST['lastname']));
-                $password = md5($_POST['password']);
-                $confirmpassword = md5($_POST['confirmpassword']);
-                $gender = htmlspecialchars(strip_tags($_POST['gender']));
-                $dateofbirth = date('Y-m-d', strtotime($_POST['dateofbirth']));
+                $username = $_POST['username'];
+                $firstname = $_POST['firstname'];
+                $lastname = $_POST['lastname'];
+                $password = $_POST['password'];
+                $confirmpassword = $_POST['confirmpassword'];
+                $gender = isset($_POST['gender']) ? $_POST['gender'] : "";
+                $dateofbirth = $_POST['dateofbirth'];
+                $flag = 1;
+                $message = "";
+                $year = substr($dateofbirth,0,4);
+                $todayyear = date("Y");
+                $age = $todayyear - $year;
 
-                if (empty($password || $confirmpassword)) {
-                    echo "Please enter password.";
-                } elseif ($password != $confirmpassword) {
-                    echo "Password does not match.";
-                } elseif (strlen($password) < 6) {
-                    echo "Password should be at least 6 characters in length";
-                } else {
+                if ($username == "" || $firstname == "" || $lastname == "" || $password == "" || $confirmpassword == "" || $gender == "" || $dateofbirth == "") {
+                    $flag = 0;
+                    $message = "Please fill in all information. ";
+                }
+                if (strlen($password) < 6) {
+                    $flag = 0;
+                    $message = $message . "Password should be at least 6 characters in length. ";
+                }
+                if ($password != $confirmpassword) {
+                    $flag = 0;
+                    $message = $message . "Password does not match. ";
+                }
+                if ($age < 18) {
+                    $flag = 0;
+                    $message = $message . "User should be 18years old or above. ";
+                }
 
-                // bind the parameters
-                $stmt->bindParam(':username', $username);
-                $stmt->bindParam(':firstname', $firstname);
-                $stmt->bindParam(':lastname', $lastname);
-                $stmt->bindParam(':password', $password);
-                $stmt->bindParam(':confirmpassword', $confirmpassword);
-                $stmt->bindParam(':gender', $gender);
-                $stmt->bindParam(':dateofbirth', $dateofbirth);
-                // specify when this record was inserted to the database
-                $registrationdateandtime = date('Y-m-d H:i:s');
-                $stmt->bindParam(':registrationdateandtime', $registrationdateandtime);
-                // Execute the query
-                if ($stmt->execute()) {
-                    echo "<div class='alert alert-success'>Record was saved.</div>";
+                if ($flag == 1) {
+                    // insert query
+                    $query = "INSERT INTO customers SET username=:username, password=:password, confirmpassword=:confirmpassword,firstname=:firstname,lastname=:lastname,gender=:gender,dateofbirth=:dateofbirth,registrationdateandtime=:registrationdateandtime";
+                    // prepare query for execution
+                    $stmt = $con->prepare($query);
+
+                    // bind the parameters
+                    $stmt->bindParam(':username', $username);
+                    $stmt->bindParam(':firstname', $firstname);
+                    $stmt->bindParam(':lastname', $lastname);
+                    $stmt->bindParam(':password', $password);
+                    $stmt->bindParam(':confirmpassword', $confirmpassword);
+                    $stmt->bindParam(':gender', $gender);
+                    $stmt->bindParam(':dateofbirth', $dateofbirth);
+                    // specify when this record was inserted to the database
+                    $registrationdateandtime = date('Y-m-d H:i:s');
+                    $stmt->bindParam(':registrationdateandtime', $registrationdateandtime);
+                    // Execute the query
+                    if ($stmt->execute()) {
+                        echo "<div class='alert alert-success'>Record was saved.</div>";
+                    } else {
+                        echo "<div class='alert alert-danger'>Unable to save record.</div>";
+                    }
                 } else {
-                    echo "<div class='alert alert-danger'>Unable to save record.</div>";
+                    echo "<div class='alert alert-danger'>$message</div>";
                 }
             }
-        }
+
             // show error
             catch (PDOException $exception) {
                 die('ERROR: ' . $exception->getMessage());
@@ -76,6 +95,14 @@
                     <td><input type='text' name='username' class='form-control'></td>
                 </tr>
                 <tr>
+                    <td>Password</td>
+                    <td><input type='password' name='password' class='form-control' /></td>
+                </tr>
+                <tr>
+                    <td>Confirm Password</td>
+                    <td><input type='password' name='confirmpassword' class='form-control' /></td>
+                </tr>
+                <tr>
                     <td>First Name</td>
                     <td><input type='text' name='firstname' class='form-control' /></td>
                 </tr>
@@ -83,23 +110,11 @@
                     <td>Last Name</td>
                     <td><input type='text' name='lastname' class='form-control' /></td>
                 </tr>
-                <tr>
-                    <td>Password</td>
-                    <td><input type='password' name='password' class='form-control' minlength="6"required /></td>
-                </tr>
-                <tr>
-                    <td>Confirm Password</td>
-                    <td><input type='password' name='confirmpassword' class='form-control' minlength="6"required /></td>
-                </tr>
-                <tr>
-                    <td>Gender</td>
-                    <td>
-                        <select class="form-select form-select-sm" name='gender' aria-label="Gender">
-                            <option selected>Choose Your Gender</option>
-                            <option value="0">Male</option>
-                            <option value="1">Female</option>
-                        </select>
-                    </td>
+                <td>Gender</td>
+                    <td> <input type="radio" id="female" name="gender" value="1">
+                          <label for="female">Female</label>
+                          <input type="radio" id="male" name="gender" value="0">
+                          <label for="male">Male</label>
                 </tr>
                 <tr>
                     <td>date of birth</td>

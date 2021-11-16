@@ -14,7 +14,7 @@ echo '<nav class="navbar navbar-expand-sm navbar-light bg-light" aria-label="Thi
                             aria-expanded="false">Products</a>
                         <ul class="dropdown-menu" aria-labelledby="dropdown03">
                             <li><a class="dropdown-item" href="create.php">Create Product</a></li>
-                            <li><a class="dropdown-item" href="read_one_product.php">Read Product</a></li>
+                            <li><a class="dropdown-item" href="productlist.php">Read Product</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -22,7 +22,7 @@ echo '<nav class="navbar navbar-expand-sm navbar-light bg-light" aria-label="Thi
                             aria-expanded="false">Customers</a>
                         <ul class="dropdown-menu" aria-labelledby="dropdown03">
                             <li><a class="dropdown-item" href="customer.php">Create Customer</a></li>
-                            <li><a class="dropdown-item" href="read_one_product.php">Read Customer</a></li>
+                            <li><a class="dropdown-item" href="customerlist.php">Read Customer</a></li>
                         </ul>
                     </li>
                 </ul>

@@ -33,7 +33,27 @@
                 $promotionprice = htmlspecialchars(strip_tags($_POST['promotionprice']));
                 $manufacturedate = date(strip_tags($_POST['manufacturedate']));
                 $expireddate = date(strip_tags($_POST['expireddate']));
+                $flag = 1;
+                $message = "";
 
+                if ($name == "" || $description == "" || $price == "" || $promotionprice == "" || $manufacturedate == "" || $expireddate == "") {
+                    $flag = 0;
+                    $message = "Please fill in all information. ";
+                }
+                if (!is_numeric($price)) {
+                    $flag = 0;
+                    $message = $message . "Please insert a valid number. ";
+                }
+                if ($promotionprice > $price) {
+                    $flag = 0;
+                    $message = $message . "Promotion price should less than price. ";
+                }
+                if($expireddate < $manufacturedate){
+                    $flag = 0;
+                    $message = $message . "Expired date should be late than manufacture date. ";
+                }
+
+                if ($flag == 1) {
                     // bind the parameters
                     $stmt->bindParam(':name', $name);
                     $stmt->bindParam(':description', $description);
@@ -50,13 +70,9 @@
                     } else {
                         echo "<div class='alert alert-danger'>Unable to save record.</div>";
                     }
-                
-
-                if (is_numeric($price)) {
-                    echo var_export($price, true) . " is numeric", PHP_EOL;
                 } else {
-                    echo var_export($price, true) . " is NOT numeric", PHP_EOL;
-                }    
+                    echo "<div class='alert alert-danger'>$message</div>";
+                }
             }
             // show error
             catch (PDOException $exception) {
@@ -77,11 +93,11 @@
                 </tr>
                 <tr>
                     <td>Price</td>
-                    <td><input type='number' name='price' class='form-control' /></td>
+                    <td><input type='number' step="any" name='price' class='form-control' /></td>
                 </tr>
                 <tr>
                     <td>Promotion Price</td>
-                    <td><input type='number' name='promotionprice' class='form-control' /></td>
+                    <td><input type='number' step="any" name='promotionprice' class='form-control' /></td>
                 </tr>
                 <tr>
                     <td>Manufacture Date</td>
