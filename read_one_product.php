@@ -1,3 +1,5 @@
+<?php include 'session.php'; ?>
+
 <!DOCTYPE HTML>
 <html>
 
@@ -94,7 +96,7 @@
         </table>
 
     </div> <!-- end.container -->
-
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

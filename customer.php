@@ -1,3 +1,5 @@
+<?php include 'session.php'; ?>
+
 <!DOCTYPE HTML>
 <html>
 
@@ -22,6 +24,7 @@
             // include database connection
             include 'config/database.php';
             try {
+
                 // posted values
                 $username = $_POST['username'];
                 $firstname = $_POST['firstname'];
@@ -32,7 +35,7 @@
                 $dateofbirth = $_POST['dateofbirth'];
                 $flag = 1;
                 $message = "";
-                $year = substr($dateofbirth,0,4);
+                $year = substr($dateofbirth, 0, 4);
                 $todayyear = date("Y");
                 $age = $todayyear - $year;
 
@@ -40,6 +43,7 @@
                     $flag = 0;
                     $message = "Please fill in all information. ";
                 }
+
                 if (strlen($password) < 6) {
                     $flag = 0;
                     $message = $message . "Password should be at least 6 characters in length. ";
@@ -53,18 +57,26 @@
                     $message = $message . "User should be 18years old or above. ";
                 }
 
+                $query = "SELECT username FROM customers WHERE username = ?";
+                $stmt = $con->prepare($query);
+                $stmt->bindParam(1, $username);
+                $stmt->execute();
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (is_array($row)) {
+                    $flag = 0;
+                    $message = $message . "User are already existed. ";
+                }
+
                 if ($flag == 1) {
-                    // insert query
-                    $query = "INSERT INTO customers SET username=:username, password=:password, confirmpassword=:confirmpassword,firstname=:firstname,lastname=:lastname,gender=:gender,dateofbirth=:dateofbirth,registrationdateandtime=:registrationdateandtime";
-                    // prepare query for execution
-                    $stmt = $con->prepare($query);
+
 
                     // bind the parameters
                     $stmt->bindParam(':username', $username);
                     $stmt->bindParam(':firstname', $firstname);
                     $stmt->bindParam(':lastname', $lastname);
-                    $stmt->bindParam(':password', $password);
-                    $stmt->bindParam(':confirmpassword', $confirmpassword);
+                    $newpass = md5($password);
+                    $stmt->bindParam(':password', $newpass);
                     $stmt->bindParam(':gender', $gender);
                     $stmt->bindParam(':dateofbirth', $dateofbirth);
                     // specify when this record was inserted to the database
@@ -111,27 +123,27 @@
                     <td><input type='text' name='lastname' class='form-control' /></td>
                 </tr>
                 <td>Gender</td>
-                    <td> <input type="radio" id="female" name="gender" value="1">
-                          <label for="female">Female</label>
-                          <input type="radio" id="male" name="gender" value="0">
-                          <label for="male">Male</label>
-                </tr>
-                <tr>
-                    <td>date of birth</td>
-                    <td><input type='date' name='dateofbirth' class='form-control' /></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <input type='submit' value='Save' class='btn btn-primary' />
-                        <a href='customerlist.php' class='btn btn-danger'>Back to read customer</a>
-                    </td>
-                </tr>
+                <td> <input type="radio" id="female" name="gender" value="1">
+                      <label for="female">Female</label>
+                      <input type="radio" id="male" name="gender" value="0">
+                      <label for="male">Male</label>
+                    </tr>
+                    <tr>
+                        <td>date of birth</td>
+                        <td><input type='date' name='dateofbirth' class='form-control' /></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input type='submit' value='Save' class='btn btn-primary' />
+                            <a href='customerlist.php' class='btn btn-danger'>Back to read customer</a>
+                        </td>
+                    </tr>
             </table>
         </form>
     </div>
     <!-- end .container -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

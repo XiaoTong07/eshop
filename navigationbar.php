@@ -1,5 +1,4 @@
-<?php
-echo '<nav class="navbar navbar-expand-sm navbar-light bg-light" aria-label="Third navbar example">
+<nav class="navbar navbar-expand-sm navbar-light bg-light" aria-label="Third navbar example">
         <div class="container-fluid" bis_skin_checked="1">
             <a class="navbar-brand" href="#">Eshop</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample03"
@@ -25,8 +24,11 @@ echo '<nav class="navbar navbar-expand-sm navbar-light bg-light" aria-label="Thi
                             <li><a class="dropdown-item" href="customerlist.php">Read Customer</a></li>
                         </ul>
                     </li>
+                    <li>
+                    <a class="nav-link" href="logout.php">Logout</a>
+                    </li>
                 </ul>
             </div>
         </div>
-    </nav>';
-    ?>
+    </nav>
+    
