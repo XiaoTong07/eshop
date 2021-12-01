@@ -33,7 +33,7 @@
         // read current record's data
         try {
             // prepare select query
-            $query = "SELECT username,password,firstname,lastname,gender,dateofbirth,registrationdateandtime,accountstatus FROM customers WHERE username = ?";
+            $query = "SELECT username,password,email,firstname,lastname,gender,dateofbirth,registrationdateandtime,accountstatus FROM customers WHERE username = ?";
             $stmt = $con->prepare($query);
 
             // this is the first question mark
@@ -47,6 +47,7 @@
 
             // values to fill up our form
             $username = $row['username'];
+            $email = $row['email'];
             $password = $row['password'];
             $firstname = $row['firstname'];
             $lastname = $row['lastname'];
@@ -68,6 +69,10 @@
             <tr>
                 <td>Username</td>
                 <td><?php echo htmlspecialchars($username, ENT_QUOTES); ?></td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td><?php echo htmlspecialchars($email, ENT_QUOTES); ?></td>
             </tr>
             <tr>
                 <td>Password</td>

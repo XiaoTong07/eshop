@@ -29,19 +29,26 @@
                 $username = $_POST['username'];
                 $firstname = $_POST['firstname'];
                 $lastname = $_POST['lastname'];
+                $email = $_POST['email'];
                 $password = $_POST['password'];
                 $confirmpassword = $_POST['confirmpassword'];
                 $gender = isset($_POST['gender']) ? $_POST['gender'] : "";
                 $dateofbirth = $_POST['dateofbirth'];
                 $flag = 1;
                 $message = "";
+                $registrationdateandtime = date('Y-m-d H:i:s');
                 $year = substr($dateofbirth, 0, 4);
                 $todayyear = date("Y");
                 $age = $todayyear - $year;
 
-                if ($username == "" || $firstname == "" || $lastname == "" || $password == "" || $confirmpassword == "" || $gender == "" || $dateofbirth == "") {
+                if ($username == "" || $firstname == "" || $lastname == "" || $email == "" || $password == "" || $confirmpassword == "" || $gender == "" || $dateofbirth == "") {
                     $flag = 0;
                     $message = "Please fill in all information. ";
+                }
+
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $flag = 0;
+                    $message = "Invalid email format";
                 }
 
                 if (strlen($password) < 6) {
@@ -68,19 +75,33 @@
                     $message = $message . "User are already existed. ";
                 }
 
-                if ($flag == 1) {
+                $query = "SELECT email FROM customers WHERE username = ?";
+                $stmt = $con->prepare($query);
+                $stmt->bindParam(1, $username);
+                $stmt->execute();
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
+                if (is_array($row)) {
+                    $flag = 0;
+                    $message = $message . "Email are already existed. ";
+                }
+
+                if ($flag == 1) {
+                    // insert query
+                    $query = "INSERT INTO customers SET username=:username, firstname=:firstname, lastname=:lastname, dateofbirth=:dateofbirth, email=:email, password=:password, gender=:gender, registrationdateandtime=:registrationdateandtime";
+                    // prepare query for execution
+                    $stmt = $con->prepare($query);
 
                     // bind the parameters
                     $stmt->bindParam(':username', $username);
                     $stmt->bindParam(':firstname', $firstname);
                     $stmt->bindParam(':lastname', $lastname);
-                    $newpass = md5($password);
-                    $stmt->bindParam(':password', $newpass);
+                    $stmt->bindParam(':email', $email);
+                    $epass = md5($password);
+                    $stmt->bindParam(':password', $epass);
                     $stmt->bindParam(':gender', $gender);
                     $stmt->bindParam(':dateofbirth', $dateofbirth);
                     // specify when this record was inserted to the database
-                    $registrationdateandtime = date('Y-m-d H:i:s');
                     $stmt->bindParam(':registrationdateandtime', $registrationdateandtime);
                     // Execute the query
                     if ($stmt->execute()) {
@@ -105,6 +126,10 @@
                 <tr>
                     <td>Username</td>
                     <td><input type='text' name='username' class='form-control'></td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><input type='text' name='email' class='form-control'></td>
                 </tr>
                 <tr>
                     <td>Password</td>
