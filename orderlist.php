@@ -21,7 +21,7 @@
 
         <?php
         // include database connection
-        include 'config/database.php';
+       
 
         // delete message prompt will be here
         $query = "SELECT id,customer,orderdateandtime FROM orders ORDER BY id DESC";
