@@ -50,6 +50,7 @@
                 </tr>
                 <?php
                 $totalamount = 0;
+                
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                     // extract row
                     // this will make $row['firstname'] to just $firstname only
