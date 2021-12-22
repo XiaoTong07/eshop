@@ -15,6 +15,7 @@
     </div>
 
     WELCOME
+    
     <?php include 'footer.php'; ?>
 </body>
 
