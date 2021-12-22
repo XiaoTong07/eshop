@@ -95,6 +95,18 @@
                 ?>
             </div>
         </div>
+        <div class="col text-center border bg-light">
+                    <p class="fw-bold text-uppercase">Top Sell Product</p>
+
+                    <?php
+                    $query = "SELECT product_id, SUM(quantity) As MostSold FROM orderdetails Group By product_id ORDER BY product_id  DESC";
+                    $stmt = $con->prepare($query);
+                    $stmt->execute();
+                    $num = $stmt->rowCount();
+                    echo $num;
+
+                    ?>
+                </div>
         <?php
             $query = "SELECT id,customer,orderdateandtime FROM orders ORDER BY orderdateandtime DESC";
             $stmt = $con->prepare($query);
@@ -107,22 +119,18 @@
             $customer = $row['customer'];
             $orderdateandtime = $row['orderdateandtime'];
 
-            $totalquery = "SELECT orderdetailsid,order_id,product_id,quantity, products.id ,products.price as proprice, products.name as proname FROM orderdetails INNER JOIN products ON orderdetails.product_id = products.id WHERE order_id = ?";
-            $stmt = $con->prepare($totalquery);
-
-            // this is the first question mark
-            $stmt->bindParam(1, $proid);
-
-            // execute our query
-            $stmt->execute();
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            $totalamount =0;
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $totalpricequery = "SELECT orderdetailsid,order_id,product_id,quantity, products.id ,products.price as proprice, products.name as proname FROM orderdetails INNER JOIN products ON orderdetails.product_id = products.id WHERE order_id=?";
+            $totalpricestmt = $con->prepare($totalpricequery);
+            $totalpricestmt->bindParam(1, $proid);
+            $totalpricestmt->execute();
+            $row = $totalpricestmt->fetch(PDO::FETCH_ASSOC);
+            
+            $totalamount = 0;
+            while ($row = $totalpricestmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
                 $total = ($proprice * $quantity);
                 $totalamount=$totalamount+$total;
             }
-
-            $totalamount = $totalamount;
 
         ?>
         <div class="container px-4">
@@ -137,7 +145,7 @@
                             <td class='col-6'><?php echo $customer ?>
                         </div>
                         <div class='col-5'>Total Amount : </td>
-                            <td class='col-6'><?php echo $totalamount?>
+                            <td class='col-6'><?php echo number_format($totalamount,2);?>
                         </div>
                         <div class='col-5'>Order Date : </td>
                             <td class='col-6'><?php echo $orderdateandtime ?>
