@@ -12,16 +12,32 @@
                         <a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-bs-toggle="dropdown"
                             aria-expanded="false">Products</a>
                         <ul class="dropdown-menu" aria-labelledby="dropdown03">
-                            <li><a class="dropdown-item" href="create.php">Create Product</a></li>
+                            <li><a class="dropdown-item" href="createproduct.php">Create Product</a></li>
                             <li><a class="dropdown-item" href="productlist.php">Read Product</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-bs-toggle="dropdown"
+                            aria-expanded="false">Category</a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdown03">
+                            <li><a class="dropdown-item" href="createcategory.php">Create Category</a></li>
+                            <li><a class="dropdown-item" href="categorylist.php">Read Category</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-bs-toggle="dropdown"
                             aria-expanded="false">Customers</a>
                         <ul class="dropdown-menu" aria-labelledby="dropdown03">
-                            <li><a class="dropdown-item" href="customer.php">Create Customer</a></li>
+                            <li><a class="dropdown-item" href="createcustomer.php">Create Customer</a></li>
                             <li><a class="dropdown-item" href="customerlist.php">Read Customer</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown px-3">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-bs-toggle="dropdown"
+                            aria-expanded="false">Orders</a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdown03">
+                            <li><a class="dropdown-item" href="createorder.php">Create Order</a></li>
+                            <li><a class="dropdown-item" href="orderlist.php">OrderList</a></li>
                         </ul>
                     </li>
                     <li>

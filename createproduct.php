@@ -18,19 +18,21 @@
         <div class="page-header">
             <h1>Create Product</h1>
         </div>
+        
         <!-- html form here where the product information will be entered -->
         <?php
+        include 'config/database.php';
         if ($_POST) {
             // include database connection
-            include 'config/database.php';
             try {
                 // insert query
-                $query = "INSERT INTO products SET name=:name, description=:description, price=:price, promotionprice=:promotionprice, manufacturedate=:manufacturedate, expireddate=:expireddate, created=:created";
+                $query = "INSERT INTO products SET name=:name, description=:description, category=:category,price=:price, promotionprice=:promotionprice, manufacturedate=:manufacturedate, expireddate=:expireddate, created=:created";
                 // prepare query for execution
                 $stmt = $con->prepare($query);
                 // posted values
                 $name = htmlspecialchars(strip_tags($_POST['name']));
                 $description = htmlspecialchars(strip_tags($_POST['description']));
+                $category = htmlspecialchars(strip_tags($_POST['category']));
                 $price = htmlspecialchars(strip_tags($_POST['price']));
                 $promotionprice = htmlspecialchars(strip_tags($_POST['promotionprice']));
                 $manufacturedate = date(strip_tags($_POST['manufacturedate']));
@@ -38,7 +40,7 @@
                 $flag = 1;
                 $message = "";
 
-                if ($name == "" || $description == "" || $price == "" || $promotionprice == "" || $manufacturedate == "" || $expireddate == "") {
+                if ($name == "" || $description == "" || $category == "" || $price == "" || $promotionprice == "" || $manufacturedate == "" || $expireddate == "") {
                     $flag = 0;
                     $message = "Please fill in all information. ";
                 }
@@ -50,7 +52,7 @@
                     $flag = 0;
                     $message = $message . "Promotion price should less than price. ";
                 }
-                if($expireddate < $manufacturedate){
+                if ($expireddate < $manufacturedate) {
                     $flag = 0;
                     $message = $message . "Expired date should be late than manufacture date. ";
                 }
@@ -59,6 +61,7 @@
                     // bind the parameters
                     $stmt->bindParam(':name', $name);
                     $stmt->bindParam(':description', $description);
+                    $stmt->bindParam(':category', $category);
                     $stmt->bindParam(':price', $price);
                     $stmt->bindParam(':promotionprice', $promotionprice);
                     $stmt->bindParam(':manufacturedate', $manufacturedate);
@@ -76,7 +79,6 @@
                     echo "<div class='alert alert-danger'>$message</div>";
                 }
             }
-            // show error
             catch (PDOException $exception) {
                 die('ERROR: ' . $exception->getMessage());
             }
@@ -88,6 +90,29 @@
                 <tr>
                     <td>Name</td>
                     <td><input type='text' name='name' class='form-control' /></td>
+                </tr>
+                <tr>
+                    <td>Category</td>
+                    <td>
+                        <?php
+                            $categoryquery = "SELECT id , name FROM category ORDER BY id DESC";
+                            $categorystmt = $con->prepare($categoryquery);
+                            $categorystmt->execute();
+
+                            $num = $categorystmt->rowCount();
+
+                            if ($num > 0) {
+                                echo "<select class= 'form-select' aria-label='Default select example' name='category'>";
+                                echo "<option value='A'>Select a category</option>";
+                                while ($categoryrow = $categorystmt->fetch(PDO::FETCH_ASSOC)) {
+                                    extract($categoryrow);
+                                    echo "<option value=$id>$name";
+                                    echo "</option>";
+                                }
+                                echo "</select>";
+                            }
+                        ?>
+                    </td>
                 </tr>
                 <tr>
                     <td>Description</td>

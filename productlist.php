@@ -24,18 +24,59 @@
         include 'config/database.php';
 
         // delete message prompt will be here
+        $query = "SELECT products.id as productid , products.name, category, price, promotionprice, manufacturedate, expireddate ,category.id,category.name as catname FROM products INNER JOIN category ON products.category = category.id ORDER BY products.id DESC";
 
-        // select all data
-        $query = "SELECT id, name, description, price, promotionprice, manufacturedate, expireddate FROM products ORDER BY id DESC";
+        $category = "";
+
+        if ($_POST) {
+            $query = "SELECT products.id as productid , products.name, category, price, promotionprice, manufacturedate, expireddate ,category.id,category.name as catname FROM products INNER JOIN category ON products.category = category.id WHERE category = ? ORDER BY products.id DESC ";
+
+            $category = htmlspecialchars(strip_tags($_POST['category']));
+
+            if ($category == "A") {
+                $query = "SELECT products.id as productid , products.name, category, price, promotionprice, manufacturedate, expireddate ,category.id,category.name as catname FROM products INNER JOIN category ON products.category = category.id ORDER BY products.id DESC";
+            }
+        }
+
         $stmt = $con->prepare($query);
+        if ($_POST && $category !== "A") {
+            $stmt->bindParam(1, $category);
+        }
         $stmt->execute();
-
-        // this is how to get number of rows returned
         $num = $stmt->rowCount();
 
         // link to create record form
         echo "<a href='createproduct.php' class='btn btn-primary m-b-1em'>Create New Product</a>";
+        ?>
 
+        <?php
+        $categoryquery = "SELECT id , name FROM category ORDER BY id DESC";
+        $categorystmt = $con->prepare($categoryquery);
+        $categorystmt->execute();
+
+        $numcategory = $categorystmt->rowCount();
+
+        if ($numcategory > 0) {
+
+            echo "<form action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "' method='post'>";
+            echo "<select class='form-select' aria-label='Default select example' name='category'>";
+            echo "<option value='A'>All</option>";
+            while ($row = $categorystmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                echo "<option value=$id ";
+                if ($id == $category) {
+                    echo "selected";
+                }
+                echo ">";
+                echo "{$name}";
+                echo "</option>";
+            }
+            echo "</select>";
+            echo "<input type='submit' value='Submit' class='btn btn-primary' />";
+            echo "</form>";
+        }
+        ?>
+        <?php
         //check if more than 0 record found
         if ($num > 0) {
 
@@ -45,7 +86,7 @@
             echo "<tr>";
             echo "<th>ID</th>";
             echo "<th>Name</th>";
-            echo "<th>Description</th>";
+            echo "<th>Category</th>";
             echo "<th>Price</th>";
             echo "<th>Promotion Price</th>";
             echo "<th>Manufacture Date</th>";
@@ -60,22 +101,26 @@
                 extract($row);
                 // creating new table row per record
                 echo "<tr>";
-                echo "<td>{$id}</td>";
+                echo "<td>{$productid}</td>";
                 echo "<td>{$name}</td>";
-                echo "<td>{$description}</td>";
-                echo "<td>{$price}</td>";
-                echo "<td>{$promotionprice}</td>";
+                echo "<td>{$catname}</td>";
+                echo "<td> <div class='text-end'>";
+                echo number_format($price, 2);
+                echo "</div></td>";
+                echo "<td> <div class='text-end'>";
+                echo number_format($promotionprice, 2);
+                echo "</div></td>";
                 echo "<td>{$manufacturedate}</td>";
                 echo "<td>{$expireddate}</td>";
                 echo "<td>";
                 // read one record
-                echo "<a href='read_one_product.php?id={$id}' class='btn btn-info m-r-1em'>Read</a>";
+                echo "<a href='read_one_product.php?id={$productid}' class='btn btn-info m-r-1em'>Read</a>";
 
                 // we will use this links on next part of this post
-                echo "<a href='updateproduct.php?id={$id}' class='btn btn-primary m-r-1em'>Edit</a>";
+                echo "<a href='updateproduct.php?id={$productid}' class='btn btn-primary m-r-1em'>Edit</a>";
 
                 // we will use this links on next part of this post
-                echo "<a href='#' onclick='delete_user({$id});'  class='btn btn-danger'>Delete</a>";
+                echo "<a href='' onclick='delete_user({$productid});'  class='btn btn-danger'>Delete</a>";
                 echo "</td>";
                 echo "</tr>";
             }
@@ -95,6 +140,20 @@
 
     <!-- confirm delete record will be here -->
     <?php include 'footer.php'; ?>
+    <script type='text/javascript'>
+        // confirm record deletion
+        function delete_user(id) {
+
+            var answer = confirm('Are you sure?');
+            if (answer) {
+                // if user clicked ok,
+                // pass the id to delete.php and execute the delete query
+                window.location = 'deleteproduct.php?id=' + id;
+            }
+        }
+    </script>
+
+
 </body>
 
 </html>

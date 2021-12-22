@@ -35,7 +35,7 @@
     </div>
     <div class="container">
         <div class="page-header">
-            <h1>Update Product</h1>
+            <h1>Update Category</h1>
         </div>
         <?php
         // get passed parameter value, in this case, the record ID
@@ -48,7 +48,7 @@
         // read current record's data
         try {
             // prepare select query
-            $query = "SELECT id, name, description, price FROM products WHERE id = ? LIMIT 0,1";
+            $query = "SELECT id, name FROM category WHERE id = ? LIMIT 0,1";
             $stmt = $con->prepare($query);
 
             // this is the first question mark
@@ -62,8 +62,6 @@
 
             // values to fill up our form
             $name = $row['name'];
-            $description = $row['description'];
-            $price = $row['price'];
 
             // retrieve our table contents
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -74,14 +72,12 @@
                 echo "<tr>";
                 echo "<td>{$id}</td>";
                 echo "<td>{$name}</td>";
-                echo "<td>{$description}</td>";
-                echo "<td>${$price}</td>";
                 echo "<td>";
                 // read one record
-                echo "<a href='read_one_product.php?id={$id}' class='btn btn-info m-r-1em'>Read</a>";
+                echo "<a href='read_one_category.php?id={$id}' class='btn btn-info m-r-1em'>Read</a>";
 
                 // we will use this links on next part of this post
-                echo "<a href='updateproduct.php?id={$id}' class='btn btn-primary m-r-1em'>Edit</a>";
+                echo "<a href='updatecategory.php?id={$id}' class='btn btn-primary m-r-1em'>Edit</a>";
 
                 // we will use this links on next part of this post
                 echo "<a href='#' onclick='delete_user({$id});'  class='btn btn-danger'>Delete</a>";
@@ -102,18 +98,14 @@
                 // write update query
                 // in this case, it seemed like we have so many fields to pass and
                 // it is better to label them and not use question marks
-                $query = "UPDATE products
-                  SET name=:name, description=:description,price=:price WHERE id = :id";
+                $query = "UPDATE category
+                  SET name=:name WHERE id = :id";
                 // prepare query for excecution
                 $stmt = $con->prepare($query);
                 // posted values
                 $name = htmlspecialchars(strip_tags($_POST['name']));
-                $description = htmlspecialchars(strip_tags($_POST['description']));
-                $price = htmlspecialchars(strip_tags($_POST['price']));
                 // bind the parameters
                 $stmt->bindParam(':name', $name);
-                $stmt->bindParam(':description', $description);
-                $stmt->bindParam(':price', $price);
                 $stmt->bindParam(':id', $id);
                 // Execute the query
                 if ($stmt->execute()) {
@@ -131,45 +123,18 @@
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"] . "?id={$id}"); ?>" method="post">
             <table class='table table-hover table-responsive table-bordered'>
                 <tr>
+                    <td>ID</td>
+                    <td><?php echo htmlspecialchars($id, ENT_QUOTES);  ?></td>
+                </tr>
+                <tr>
                     <td>Name</td>
                     <td><input type='text' name='name' value="<?php echo htmlspecialchars($name, ENT_QUOTES);  ?>" class='form-control' /></td>
-                </tr>
-                <tr>
-                    <td>Description</td>
-                    <td><textarea name='description' class='form-control'><?php echo htmlspecialchars($description, ENT_QUOTES);  ?></textarea></td>
-                </tr>
-                <tr>
-                    <td>Category</td>
-                    <td>
-                        <?php
-                            $categoryquery = "SELECT id , name FROM category ORDER BY id DESC";
-                            $categorystmt = $con->prepare($categoryquery);
-                            $categorystmt->execute();
-
-                            $num = $categorystmt->rowCount();
-
-                            if ($num > 0) {
-                                echo "<select class= 'form-select' aria-label='Default select example' name='category'>";
-                                echo "<option value='A'>Select a category</option>";
-                                while ($categoryrow = $categorystmt->fetch(PDO::FETCH_ASSOC)) {
-                                    extract($categoryrow);
-                                    echo "<option value=$id>$name";
-                                    echo "</option>";
-                                }
-                                echo "</select>";
-                            }
-                        ?>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Price</td>
-                    <td><input type='text' name='price' value="<?php echo htmlspecialchars($price, ENT_QUOTES);  ?>" class='form-control' /></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td>
                         <input type='submit' value='Save Changes' class='btn btn-primary' />
-                        <a href='productlist.php' class='btn btn-danger'>Back to read products</a>
+                        <a href='categorylist.php' class='btn btn-danger'>Back to read category</a>
                     </td>
                 </tr>
             </table>

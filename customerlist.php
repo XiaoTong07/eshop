@@ -68,7 +68,7 @@
                 echo "<td>" . ($gender != 1 ? 'Male' : 'Female') . "</td>";
                 echo "<td>{$dateofbirth}</td>";
                 echo "<td>{$registrationdateandtime}</td>";
-                echo "<td>{$accountstatus}</td>";
+                echo "<td>".($accountstatus != 1 ? 'Offline' : 'Online')."</td>";
                 echo "<td>";
                 // read one record
                 echo "<a href='read_one_customer.php?username={$username}' class='btn btn-info m-r-1em'>Read</a>";
@@ -77,7 +77,7 @@
                 echo "<a href='updatecustomer.php?username={$username}' class='btn btn-primary m-r-1em'>Edit</a>";
 
                 // we will use this links on next part of this post
-                echo "<a href='#' onclick='delete_user({$username});'  class='btn btn-danger'>Delete</a>";
+                echo "<a onclick='delete_user(\"{$username}\");'  class='btn btn-danger'>Delete</a>";
                 echo "</td>";
                 echo "</tr>";
             }
@@ -97,6 +97,18 @@
 
     <!-- confirm delete record will be here -->
     <?php include 'footer.php'; ?>
+    <script type='text/javascript'>
+        // confirm record deletion
+        function delete_user(username) {
+
+            var answer = confirm('Are you sure?');
+            if (answer) {
+                // if user clicked ok,
+                // pass the id to delete.php and execute the delete query
+                window.location = 'deletecustomer.php?username=' + username;
+            }
+        }
+    </script>
 </body>
 
 </html>
